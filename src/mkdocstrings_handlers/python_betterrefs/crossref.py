@@ -1,31 +1,18 @@
-#  Copyright (c) 2022-2024.   Analog Devices Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
 """Support for translating compact relative crossreferences in docstrings."""
 
 from __future__ import annotations
 
 import re
-from typing import Callable, List, Optional, cast
+from collections.abc import Callable
+from typing import cast
 
 from griffe import Docstring, Object
 from mkdocstrings.loggers import get_logger
 
-__all__ = [
-    "substitute_relative_crossrefs"
-]
+__all__ = ["substitute_relative_crossrefs"]
 
 logger = get_logger(__name__)
+
 
 def _re_or(*exps: str) -> str:
     """Construct an "or" regular expression from a sequence of regular expressions.
@@ -53,6 +40,7 @@ def _re_named(name: str, exp: str, optional: bool = False) -> str:
     optchar = "?" if optional else ""
     return f"(?P<{name}>{exp}){optchar}"
 
+
 _RE_CROSSREF = re.compile(r"\[([^\[\]]+?)\]\[([^\[\]]*?)\]")
 """Regular expression that matches general cross-references."""
 
@@ -75,7 +63,7 @@ _RE_REL = re.compile(
         ),
         optional=True,
     )
-    + _re_named("relname", r"(?:[a-zA-Z_][a-zA-Z0-9_\.]*)?")
+    + _re_named("relname", r"(?:[a-zA-Z_][a-zA-Z0-9_\.]*)?"),
 )
 """Regular expression that matches a relative path reference.
 
@@ -101,22 +89,21 @@ def _always_ok(_ref: str) -> bool:
 
 
 class _RelativeCrossrefProcessor:
-    """
-    A callable object that can substitute relative cross-reference expressions.
+    """A callable object that can substitute relative cross-reference expressions.
 
     This is intended to be used as a substitution function by `re.sub`
     to process relative cross-references in a doc-string.
     """
 
     _doc: Docstring
-    _cur_match: re.Match | None
+    _cur_match: re.Match[str] | None
     _cur_input: str
     _cur_offset: int
-    _cur_ref_parts: List[str]
+    _cur_ref_parts: list[str]
     _ok: bool
     _check_ref: Callable[[str], bool]
 
-    def __init__(self, doc: Docstring, checkref: Optional[Callable[[str], bool]] = None):
+    def __init__(self, doc: Docstring, checkref: Callable[[str], bool] | None = None):
         self._doc = doc
         self._cur_match = None
         self._cur_input = ""
@@ -125,9 +112,8 @@ class _RelativeCrossrefProcessor:
         self._check_ref = checkref or _always_ok
         self._ok = True
 
-    def __call__(self, match: re.Match) -> str:
-        """
-        Process a cross-reference expression.
+    def __call__(self, match: re.Match[str]) -> str:
+        """Process a cross-reference expression.
 
         This should be called with a match from the _RE_CROSSREF expression
         which matches expression of the form [<title>][<ref>].
@@ -161,14 +147,17 @@ class _RelativeCrossrefProcessor:
                 self._process_append_from_title(ref_match, title)
 
             if self._ok:
-                new_ref = '.'.join(self._cur_ref_parts)
+                new_ref = ".".join(self._cur_ref_parts)
                 logger.debug(
                     "cross-reference substitution\nin %s:\n[%s][%s] -> [...][%s]",
-                    cast(Object, self._doc.parent).canonical_path, title, ref, new_ref
+                    cast(Object, self._doc.parent).canonical_path,
+                    title,
+                    ref,
+                    new_ref,
                 )
 
         # builtin names get handled specially somehow, so don't check here
-        if new_ref not in __builtins__ and not checkref(new_ref):  # type: ignore[operator]
+        if new_ref not in __builtins__ and not checkref(new_ref):
             self._error(f"Cannot load reference '{new_ref}'")
 
         if new_ref:
@@ -178,19 +167,19 @@ class _RelativeCrossrefProcessor:
 
         return result
 
-    def _start_match(self, match: re.Match) -> None:
+    def _start_match(self, match: re.Match[str]) -> None:
         self._cur_match = match
         self._cur_offset = match.start(0)
         self._cur_input = match[0]
         self._ok = True
         self._cur_ref_parts.clear()
 
-    def _process_relname(self, ref_match: re.Match) -> None:
+    def _process_relname(self, ref_match: re.Match[str]) -> None:
         relname = ref_match.group("relname").strip(".")
         if relname:
             self._cur_ref_parts.append(relname)
 
-    def _process_append_from_title(self, ref_match: re.Match, title_text: str) -> None:
+    def _process_append_from_title(self, ref_match: re.Match[str], title_text: str) -> None:
         if ref_match.group(0).endswith("."):
             id_from_title = title_text.strip("`*")
             if not _RE_ID.fullmatch(id_from_title):
@@ -198,7 +187,7 @@ class _RelativeCrossrefProcessor:
                 return
             self._cur_ref_parts.append(id_from_title)
 
-    def _process_parent_specifier(self, ref_match: re.Match) -> None:
+    def _process_parent_specifier(self, ref_match: re.Match[str]) -> None:
         if not ref_match.group("parent"):
             return
 
@@ -218,19 +207,16 @@ class _RelativeCrossrefProcessor:
         if rel_obj is not None and self._ok:
             self._cur_ref_parts.append(rel_obj.canonical_path)
 
-    def _process_current_specifier(self, obj: Object, ref_match: re.Match) -> Optional[Object]:
+    def _process_current_specifier(self, obj: Object, ref_match: re.Match[str]) -> Object | None:
         rel_obj: Object | None = None
         if ref_match.group("current"):
             if obj.is_function:
-                self._error(
-                    f"Cannot use '.' in function {obj.canonical_path}",
-                    just_warn=False
-                )
+                self._error(f"Cannot use '.' in function {obj.canonical_path}", just_warn=False)
             else:
                 rel_obj = obj
         return rel_obj
 
-    def _process_class_specifier(self, obj: Object, ref_match: re.Match) -> Optional[Object]:
+    def _process_class_specifier(self, obj: Object, ref_match: re.Match[str]) -> Object | None:
         rel_obj: Object | None = None
         if ref_match.group("class"):
             rel_obj = obj
@@ -241,7 +227,7 @@ class _RelativeCrossrefProcessor:
                     break
         return rel_obj
 
-    def _process_module_specifier(self, obj: Object, ref_match: re.Match) -> Optional[Object]:
+    def _process_module_specifier(self, obj: Object, ref_match: re.Match[str]) -> Object | None:
         rel_obj: Object | None = None
         if ref_match.group("module"):
             rel_obj = obj
@@ -252,7 +238,7 @@ class _RelativeCrossrefProcessor:
                     break
         return rel_obj
 
-    def _process_package_specifier(self, obj: Object, ref_match: re.Match) -> Optional[Object]:
+    def _process_package_specifier(self, obj: Object, ref_match: re.Match[str]) -> Object | None:
         # griffe does not distinguish between modules and packages, so we identify a package
         # as a module that contains other modules. A module that has no parent is considered to
         # be a package even if it does not contain modules.
@@ -275,7 +261,7 @@ class _RelativeCrossrefProcessor:
 
         return rel_obj
 
-    def _process_up_specifier(self, obj: Object, ref_match: re.Match) -> Optional[Object]:
+    def _process_up_specifier(self, obj: Object, ref_match: re.Match[str]) -> Object | None:
         rel_obj: Object | None = None
         if ref_match.group("up"):
             level = len(ref_match.group("up"))
@@ -313,12 +299,12 @@ class _RelativeCrossrefProcessor:
                 # that without knowing how much the doc string was unindented.
             prefix += " \n"
 
-        logger.warning(prefix + msg)
+        logger.warning(prefix + msg)  # noqa: G003
 
         self._ok = just_warn
 
 
-def substitute_relative_crossrefs(obj: Object, checkref: Optional[Callable[[str], bool]] = None) -> None:
+def substitute_relative_crossrefs(obj: Object, checkref: Callable[[str], bool] | None = None) -> None:
     """Recursively expand relative cross-references in all docstrings in tree.
 
     Arguments:

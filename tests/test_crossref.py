@@ -1,16 +1,3 @@
-#  Copyright (c) 2022-2024.   Analog Devices Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
 """Unit tests for relative crossref expansion."""
 
 from __future__ import annotations
@@ -18,21 +5,22 @@ from __future__ import annotations
 import inspect
 import logging
 import re
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Optional
 
 import pytest
 from griffe import Class, Docstring, Function, Module, Object
 
 # noinspection PyProtectedMember
-from mkdocstrings_handlers.python_xref.crossref import (
-    _RE_CROSSREF,
-    _RE_REL_CROSSREF,
-    _RelativeCrossrefProcessor,
+from mkdocstrings_handlers.python_betterrefs.crossref import (
+    _RE_CROSSREF,  # pyright: ignore[reportPrivateUsage]
+    _RE_REL_CROSSREF,  # pyright: ignore[reportPrivateUsage]
+    _RelativeCrossrefProcessor,  # pyright: ignore[reportPrivateUsage]
     substitute_relative_crossrefs,
 )
 
-def test_RelativeCrossrefProcessor(caplog: pytest.LogCaptureFixture) -> None:
+
+def test_RelativeCrossrefProcessor(caplog: pytest.LogCaptureFixture) -> None:  # noqa: N802
     """Unit test for internal _RelativeCrossrefProcessor class.
 
     Arguments:
@@ -46,14 +34,17 @@ def test_RelativeCrossrefProcessor(caplog: pytest.LogCaptureFixture) -> None:
     meth1 = Function(name="meth1", parent=cls1)
     cls1.members.update(meth1=meth1)
 
-    def assert_sub(parent: Object, title: str, ref: str,
-                   expected: str = "",
-                   *,
-                   warning: str = "",
-                   relative: bool = True,
-                   checkref: Optional[Callable[[str],bool]] = None
-                   ) -> None:
-        """Tests a relative crossref substitution
+    def assert_sub(
+        parent: Object,
+        title: str,
+        ref: str,
+        expected: str = "",
+        *,
+        warning: str = "",
+        relative: bool = True,
+        checkref: Callable[[str], bool] | None = None,
+    ) -> None:
+        """Tests a relative crossref substitution.
 
         Arguments:
             parent: assumed parent object for docstring
@@ -98,8 +89,8 @@ def test_RelativeCrossrefProcessor(caplog: pytest.LogCaptureFixture) -> None:
     assert_sub(meth1, "foo", "(c).baz.", "mod1.mod2.Class1.baz.foo")
     assert_sub(meth1, "foo", "(m).", "mod1.mod2.foo")
     assert_sub(meth1, "foo", "mod3.", "mod3.foo")
-    assert_sub(meth1, "foo", "^^.", "mod1.mod2.foo", checkref = lambda x: True)
-    assert_sub(meth1, "foo", "...", "mod1.mod2.foo", checkref = lambda x: True)
+    assert_sub(meth1, "foo", "^^.", "mod1.mod2.foo", checkref=lambda x: True)
+    assert_sub(meth1, "foo", "...", "mod1.mod2.foo", checkref=lambda x: True)
     assert_sub(meth1, "Class1", "(p).mod2.", "mod1.mod2.Class1")
     assert_sub(mod1, "Class1", "(P).mod2.Class1", "mod1.mod2.Class1")
 
@@ -110,8 +101,7 @@ def test_RelativeCrossrefProcessor(caplog: pytest.LogCaptureFixture) -> None:
         return False
 
     assert_sub(cls1, "foo", "?.", "mod1.mod2.Class1.foo", checkref=assert_nocheck)
-    assert_sub(cls1, "foo", "?mod1.mod2.Class1.foo", "mod1.mod2.Class1.foo",
-               checkref=assert_nocheck, relative=False)
+    assert_sub(cls1, "foo", "?mod1.mod2.Class1.foo", "mod1.mod2.Class1.foo", checkref=assert_nocheck, relative=False)
 
     # Error cases
 
@@ -121,13 +111,23 @@ def test_RelativeCrossrefProcessor(caplog: pytest.LogCaptureFixture) -> None:
     assert_sub(meth1, "bad id", "..", warning="not a qualified identifier")
     assert_sub(mod2, "foo", "(c)", warning="not in a class")
     assert_sub(meth1, "foo", "^^^^", warning="too many levels")
-    assert_sub(meth1, "foo", "..", "mod1.mod2.Class1.foo",
-               warning = "Cannot load reference 'mod1.mod2.Class1.foo'",
-               checkref=lambda x: False)
-    assert_sub(meth1, "foo", "mod1.mod2.Class1.foo", "mod1.mod2.Class1.foo",
-               warning = "Cannot load reference 'mod1.mod2.Class1.foo'",
-               relative=False,
-               checkref=lambda x: False)
+    assert_sub(
+        meth1,
+        "foo",
+        "..",
+        "mod1.mod2.Class1.foo",
+        warning="Cannot load reference 'mod1.mod2.Class1.foo'",
+        checkref=lambda x: False,
+    )
+    assert_sub(
+        meth1,
+        "foo",
+        "mod1.mod2.Class1.foo",
+        "mod1.mod2.Class1.foo",
+        warning="Cannot load reference 'mod1.mod2.Class1.foo'",
+        relative=False,
+        checkref=lambda x: False,
+    )
 
 
 def test_substitute_relative_crossrefs(caplog: pytest.LogCaptureFixture) -> None:
@@ -169,7 +169,7 @@ def test_substitute_relative_crossrefs(caplog: pytest.LogCaptureFixture) -> None
         """
     [foo][mod1.mod2.Class1.foo]
     [bar][mod1.mod2.bar]
-    """
+    """,
     )
 
     assert len(caplog.records) == 0

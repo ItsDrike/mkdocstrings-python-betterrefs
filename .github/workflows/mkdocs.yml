@@ -1,0 +1,71 @@
+---
+name: MkDocs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: # Add closed type
+      - opened
+      - reopened
+      - synchronize
+      - closed # to delete the PR preview
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  PYTHON_VERSION: "3.14"
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: "${{ github.token }}"
+          # Fetch the entire git history (all branches + tags)
+          # We do this because the docs use git describe, which requires having all
+          # the commits up to the latest version tag.
+          # We also need the gh-pages branch to push the docs to.
+          fetch-depth: 0
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-suffix: "docs-py${{ env.python-version }}"
+
+      - name: Install dependencies
+        run: |
+          uv sync --no-default-groups --group docs
+
+      - name: Build the documentation (mkdocs - PR preview)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: mkdocs build
+
+      - name: Deploy docs - PR preview
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./site
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          token: ${{ github.token }}
+
+      - name: Build the documentation (mike)
+        if: ${{ github.event_name == 'push' }}
+        run: mike deploy latest
+
+      - name: Deploy docs - latest
+        if: ${{ github.event_name == 'push' }}
+        run: git push origin gh-pages

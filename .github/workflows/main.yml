@@ -1,39 +1,21 @@
+---
 name: CI
-on: [push]
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+# Cancel already running workflows if new ones are scheduled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-os-python:
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 5
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.8", "3.10", "3.12"]
-    steps:
-    - uses: actions/checkout@v3
-    - uses: goanpeca/setup-miniconda@v2.2.0
-      with:
-        miniforge-version: latest
-        conda-version: ">=23.7.4"
-        conda-build-version: ">=3.26"
-        environment-file: environment.yml
-        activate-environment: mkxref-dev
-        python-version: ${{ matrix.python-version }}
-        condarc-file: github-condarc.yml
-        auto-activate-base: true
-        use-mamba: true
-    - name: Dev install package
-      run: |
-        conda run -n mkxref-dev pip install -e . --no-deps --no-build-isolation
-    - name: ruff
-      run: |
-        make ruff
-    - name: mypy
-      if: success() || failure()
-      run: |
-        make mypy
-    - name: Test with pytest
-      if: success() || failure()
-      run: |
-        make coverage-test
+  validation:
+    uses: ./.github/workflows/validation.yml
+
+  unit-tests:
+    uses: ./.github/workflows/unit-tests.yml

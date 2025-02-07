@@ -1,20 +1,17 @@
-# mkdocstring-python-xref changes
+## [UNRELEASED] Version 0.1.0 (2025-02-09)
 
-## 1.6.2
+This is the initial release following a **rewrite of the project (fork)**.
 
-* Use griffe 1.0 or later
+### Breaking changes
 
-## 1.6.1
+- Handler name was renamed to `python_betterrefs` (from `python_xrefs`)
+- Config option `relative_crossrefs` was renamed to `better_crossrefs`
+- Config option `better_crossrefs` (previously `relative_crossrefs`) is now enabled by default
 
-* Available on conda-forge
+### Other changes
 
-## 1.6.0
-
-* Added explicit option to disable cross-reference checking.
-* When enabled, check all cross-references, not just relative ones
-* If reference begins with '?', don't check cross-reference.
-
-## 1.5.3
-
-First public release
-
+- Rewrite the project documentation
+- Move to `basedpyright` type-checker (from mypy)
+- Move to `uv` package manager (from condadev)
+- Improve CI workflows
+- Improve testing

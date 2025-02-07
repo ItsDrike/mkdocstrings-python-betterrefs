@@ -1,39 +1,45 @@
-# MacOS
-.DS_Store
+# Python byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
 
-# Make
-custom.mk
+# Virtual environments
+.venv/
+.tox/
+venv/
+env/
+ENV/
 
-# Python
-__pycache__
-*.pyc
-
-# Generated files
-*.egg-info
-build/
+# Python packaging files
 dist/
-# ignore .eggs directory created by setup.py
-.eggs/
-.conda-built
-.coverage
-/htmlcov/
-/site/
-/pages-tmp/
-/public/
-/tests/.aws/
-conda-meta-data.json
-# stray build artifacts
-*.whl
-*.tar.bz2
-*.conda
 
-# tox
-/.tox/
-/tox-env.yml
-/tox-requirements.txt
+# Pytest coverage reports
+htmlcov/
+.coverage*
+coverage.xml
 
-# git
-*.orig
+# Mkdocs documentation
+site/
 
+# Pyenv local version information
+.python-version
 
+# Editor generated files
+.idea/
+.vscode/
+.spyproject/
+.spyderproject/
+.replit
 
+# Auto-generated folder attributes for MacOS
+.DS_STORE
+
+# Local gitignore (symlinked to .git/info/exclude)
+.gitignore_local
+
+# Environmental, backup and personal files
+*.env
+*.bak
+TODO

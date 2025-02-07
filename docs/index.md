@@ -1,129 +1,45 @@
-## Relative cross-references
+---
+hide:
+    - navigation
+---
 
-By default, [mkdocstrings] only supports cross-references where the path is
-fully qualified or is empty, in which case it is taken from the title. 
-If you work with long package and class names or with namespace packages, this can result in a lot
-of extra typing and harder to read doc-strings.
+# mkdocstrings-python-betterrefs
 
-If you enable the `relative_crossrefs` option in the `python_xref` handler options
-in your mkdocs.yml file ([see configuration](config.md) for an example), then the handler 
-will support more compact relative syntax:
+Python handler for [mkdocstrings] with improved handling for cross-references, including relative ones.
 
-=== "Absolute"
+[mkdocstrings] is an awesome plugin for [MkDocs] that can generate Markdown API documentation from comments in code. The
+standard [python handler (mkdomkdocstrings-python)][mkdocstrings-python] allows you to create cross-reference links
+using the syntax `[<title>][<path>]` where the path must either be the fully qualified name of the referent or is empty,
+in which case the path is taken from the title.
 
-    ```python
-    class MyClass:
-        def this_method(self):
-            """
-            See [other_method][mypkg.mymod.MyClass.other_method] 
-            from [MyClass][mypkg.mymod.Myclass]
-            """
-    ```
+mkdocstrings-python does already have support for cross-references, however, it is currently only available in the
+insiders edition, which is limited to their sponsors. Additionally, this implementation is fairly limited in comparison
+to what this project offers.
 
-=== "Relative"
+!!! tip
 
-    ```python
-    class MyClass:
-        def this_method(self):
-            """
-            See [other_method][..] from [MyClass][(c)]
-            """
-    ```
+    For more information on the mkdocstrings-python official support of relative cross-references, check out the
+    feature request proposing them: [here][official-xrefs-issue], and the docs detailing the configuration option:
+    [here][official-xrefs-docs].
 
-The relative path specifier has the following form:
+    Even though the issue proposed the syntax similar to that used by this handler, the official relative crossrefs
+    support ended up being a very limited version of it.
 
-* If the path ends in `.` then the title text will be appended to the path
-  (ignoring bold, italic or code markup).
+    It is expected that relative cross-references will make it into the open-source version once a funding goal of
+    $2,000 is reached. You can see the current progress towards this goal [here][official-xrefs-funding-goal].
 
-* If the path begins with a single `.` then it will be expanded relative to the path
-    of the doc-string in which it occurs. 
+This package extends [mkdocstrings-python] to support an improved cross-reference syntax, that allows you to write
+your doc-strings with these nicer cross-references. The primary goal is making cross-references shorter and less
+repetitive.
 
-* If the path begins with `(c)`, that will be replaced by the path of the
-    class that contains the doc-string
+Do note that this project is a fork of the original [mkdocstrings-python-xref]. For more info, see our [fork
+notice][fork-notice] section
 
-* If the path begins with `(m)`, that will be replaced by the path of the
-    module that contains the doc-string
-
-* If the path begins with `(p)`, that will be replaced by the path of the
-    package that contains the doc-string. If there is only one module in the 
-    system it will be treated as a package.
-
-* If the path begins with one or more `^` characters, then will be replaced
-    by the path of the parent element. For example, when used in a doc-string
-    for a method, `^` would get replaced with the class and `^^` would get
-    replaced with the module.
-
-* Similarly, if the path begins with two or more `.` characters, then all but
-    the last `.` will be replaced by the parent element, and if nothing follows
-    the last `.`, the title text will be appended according to the first rule.
-   
-    *NOTE: When using either `^` or `..` we have found that going up more than one
-    or two levels makes cross-references difficult to read and should be avoided*
-   
-These are demonstrated here:
-
-=== "Relative"
-
-    ```python
-    class MyClass:
-        def this_method(self):
-            """
-            [MyClass][^]
-            Also [MyClass][(c)]
-            [`that_method`][^.]
-            Also [`that_method`][..]
-            [init method][(c).__init__]
-            [this module][(m)]
-            [this package][(p)]
-            [OtherClass][(m).]
-            [some_func][^^.] or [some_func][...]
-            """
-    ```
-
-=== "Absolute"
-
-    ```python
-    class MyClass:
-        def this_method(self):
-            """
-            [MyClass][mypkg.mymod.MyClass]
-            Also [MyClass][mypkg.mymod.MyClass]
-            [`that_method`][mypkg.mymod.MyClass.that_method]
-            Also [`that_method`][mypkg.mymod.MyClass.that_method]
-            [init method][mypkg.mymod.MyClass.__init__]
-            [this module][mypkg.mymod]
-            [this package][mypkg]
-            [OtherClass][mypkg.mymod.OtherClass]
-            [some_func][mypkg.mymod.some_func]
-            """
-    ```
-
-This has been [proposed as a feature in the standard python handler][relative-crossref-issue]
-but has not yet been accepted.
-
-## Cross-reference checking
-
-If `relative_crossrefs` and `check_crossrefs` are both enabled (the latter is true by default),
-then all cross-reference expressions will be checked to ensure that they exist and failures
-will be reported with the source location. Otherwise, missing cross-references will be reported
-by mkdocstrings without the source location, in which case it is often difficult to locate the source
-of the error. Note that the errors generatoed by this feat[.gitignore](..%2F.gitignore)
-
-
-
-ure are in addition to the errors
-from mkdocstrings.
-
-The current implementation of this feature can produce false errors for definitions from the
-python standard library. You can disable the check on a case-by-case basis by prefixing the
-reference expression with a `?`, for example:
-
-```
-This function returns a [Path][?pathlib.] instance.
-```
-
-[mkdocstrings]: https://mkdocstrings.github.io/
-[mkdocstrings_python]: https://mkdocstrings.github.io/python/
-[relative-crossref-issue]: https://github.com/mkdocstrings/python/issues/27
-
-
+[MkDocs]: https://mkdocs.readthedocs.io/
+[mkdocstrings]: https://github.com/mkdocstrings/mkdocstrings
+[mkdocstrings-python]: https://github.com/mkdocstrings/python
+[official-xrefs-issue]: https://github.com/mkdocstrings/python/issues/27
+[official-xrefs-docs]: https://mkdocstrings.github.io/python/usage/configuration/docstrings/?h=relative#relative_crossrefs
+[official-xrefs-funding-goal]: https://mkdocstrings.github.io/python/insiders/#funding
+[mkdocstrings-python-xref]: https://github.com/analog-garage/mkdocstrings-python-xref
+[fork-notice]: ./meta/fork.md
