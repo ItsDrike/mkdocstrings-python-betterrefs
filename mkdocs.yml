@@ -1,87 +1,128 @@
-site_name: "mkdocstrings-python-xref"
-site_description: "A an extended Python handler for mkdocstrings."
-repo_url: https://github.com/analog-garage/mkdocstrings-python-xref
-site_url: https://github.com/analog-garage/mkdocstrings-python-xref
-repo_name: GitHub
-site_dir: site
-site_author: Christopher Barber
-copyright: Copyright &copy; 2022-2023  Analog Devices, Inc.
+site_name: "mkdocstrings-python-betterrefs"
+site_description: "Extended mkdocstrings-python handler with better cross-references support"
+site_url: https://github.com/ItsDrike/mkdocstrings-python-betterrefs
+
+repo_url: https://github.com/ItsDrike/mkdocstrings-python-betterrefs
+copyright: Copyright &copy; 2025 by <a href="mailto:itsdrike@protonmail.com">ItsDrike</a>
 
 watch:
   - src/mkdocstrings_handlers
+  - LICENSE.txt
+  - NOTICE.md
+  - CHANGELOG.md
+
+exclude_docs: |
+  LICENSE.md
 
 nav:
-- User Guide: index.md
-- Setup:
-    - Installation: install.md
-    - Configuration: config.md
-- Support:
-  - Getting help: support.md
-  - Changelog: changelog.md
-  - License: license.md
+  - Home: index.md
+  - Installation:
+      - Installation: install.md
+      - Configuration: config.md
+  - Usage: usage.md
+  - Meta:
+      - Getting help: meta/support.md
+      - Versioning: meta/versioning.md
+      - Changelog: meta/changelog.md
+      - Fork notice: meta/fork.md
+      - License: meta/license.md
+  - Contributing:
+      - Bugs & Feature requests: contributing/bugs-and-feature-reqs.md
+      - Making a PR: contributing/making-a-pr.md
 
 theme:
   name: material
   logo: logo.svg
   favicon: logo.svg
-  features:
-  - navigation.tabs
-  - navigation.tabs.sticky
-  - navigation.top
   palette:
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: white
-    accent: purple
-    toggle:
-      icon: material/weather-sunny
-      name: Switch to dark mode
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: black
-    accent: lime
-    toggle:
-      icon: material/weather-night
-      name: Switch to light mode
+    - media: "(prefers-color-scheme)"
+      primary: black
+      accent: black
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
 
-extra:
-  generator: false
-  version:
-    provider: mike
-    default: stable
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: black
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: black
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - content.tabs.link
+    - content.code.copy
+    - content.action.edit
+    - search.highlight
+    - search.share
+    - search.suggest
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - toc.follow
 
 markdown_extensions:
-- admonition
-- pymdownx.snippets:
-    check_paths: true
-- pymdownx.superfences
-- pymdownx.tabbed:
-    alternate_style: true
+  - admonition
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.tabbed:
+      alternate_style: true
 
 plugins:
-- search
-- mike:
-    # These fields are all optional; the defaults are as below...
-    canonical_version: stable
-    version_selector: true
-    css_dir: css
-    javascript_dir: js
-- mkdocstrings:
-    default_handler: python_xref
-    handlers:
-      python_xref:
-        paths: [src]
-        import:
-        - https://docs.python.org/3/objects.inv
-        - https://mkdocstrings.github.io/objects.inv
-        - https://mkdocstrings.github.io/griffe/objects.inv
-        options:
-          docstring_style: google
-          docstring_options:
-            ignore_init_summary: yes
-          merge_init_into_class: yes
-          relative_crossrefs: yes
-          separate_signature: yes
-          show_source: no
-          show_root_full_path: no
+  - search
+  - mike:
+      canonical_version: "latest"
+      version_selector: true
+  - mkdocstrings:
+      enable_inventory: true
+      default_handler: python_betterrefs
+      handlers:
+        python_betterrefs:
+          paths: [src]
+          options:
+            docstring_style: google
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            better_crossrefs: true
+            check_crossrefs: true
+            separate_signature: true
+            show_source: false
+            show_root_full_path: false
+          inventories:
+            - https://docs.python.org/3/objects.inv
+            - https://www.mkdocs.org/objects.inv
+            - https://mkdocstrings.github.io/objects.inv
+            - https://mkdocstrings.github.io/griffe/objects.inv
+            - https://mkdocstrings.github.io/autorefs/objects.inv
 
+extra:
+  version:
+    provider: mike
+    default: latest
+    alias: true

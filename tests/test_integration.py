@@ -1,117 +1,119 @@
-#  Copyright (c) 2022-2024.   Analog Devices Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-"""Integration test for python_xref handler"""
+"""Integration test for python_betterrefs handler."""
 
-import os
 import re
 import subprocess as sp
+from collections.abc import Mapping
 from os import PathLike
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import cast
 
 import bs4
 
-this_dir = Path(__file__).parent
 
-test_project_dir = this_dir.joinpath('project').absolute()
-test_project_mkdocs = test_project_dir.joinpath('mkdocs.yml')
-bar_src_file = test_project_dir.joinpath('src', 'myproj', 'bar.py')
+def run_test_project_mkdocs(test_project: Path, site_dir: Path) -> sp.CompletedProcess[str]:
+    """Run mkdocs command on a tiny sample project (contained in the same dir as this file)."""
+    mkdocs_cmd = [
+        "mkdocs",
+        "build",
+        "-f",
+        str(test_project / "mkdocs.yml"),
+        "-d",
+        str(site_dir),
+    ]
+    return sp.run(mkdocs_cmd, capture_output=True, encoding="utf8", check=False)  # noqa: S603 # input is trusted
 
 
-def check_autorefs(autorefs: List[bs4.Tag], cases: Dict[Tuple[str,str],str] ) -> None:
-    """
-    Verify autorefs contain expected cases
+def check_autorefs(html_file: Path, cases: Mapping[tuple[str, str], str]) -> None:
+    """Verify given HTML file contains all of the expected autorefs.
 
-    Arguments:
-        autorefs: list of autoref tags parsed from HTML
-        cases: mapping from (<location>,<title>) to generated reference tag
-            where <location? is the qualified name of the object whose doc string
+    Note:
+        If the HTML file contains some additional autorefs, an AssertionError will be raised.
+
+    Args:
+        html_file: HTML file to check for autorefs.
+        cases: mapping from (<location>,<title>) to generated reference link (<href>)
+            where <location> is the qualified name of the object whose doc string
             contains the cross-reference, and <title> is the text in the cross-reference.
     """
-    cases = cases.copy()
+    html = html_file.read_text()
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    autorefs = soup.find_all("a", class_=["autorefs"])
+
+    cases = dict(cases)
     for autoref in autorefs:
-        curid = autoref.find_previous(id=True).attrs['id']
+        # This is for typing purposes only, the find_all filter shouldn't ever find non-tags
+        if not isinstance(autoref, bs4.Tag):
+            raise TypeError("Autorefs contained non-tag")
+
+        cur_id = cast(bs4.Tag, autoref.find_previous(id=True)).attrs["id"]
         text = autoref.string
-        href = autoref.attrs['href']
-        expected_href = cases.get((curid, text))
+        href = autoref.attrs["href"]
+        expected_href = cases.get((cur_id, text))  # pyright: ignore[reportArgumentType]
+
         if expected_href:
             assert href == expected_href
-            cases.pop((curid, text))
+            _ = cases.pop((cur_id, text))  # pyright: ignore[reportArgumentType]
+        else:
+            raise AssertionError(f"Skipping ref: {cur_id=},{text=} -> {href!r} ({autoref!s}")
 
     assert len(cases) == 0
 
 
-def test_integration(tmpdir: PathLike) -> None:
-    """An integration test that runs mkdocs on a tiny sample project and
-    grovels the generated HTML to see that the links were resolved.
+def test_integration(test_project: Path, tmpdir: PathLike[str]) -> None:
+    """An integration test that runs mkdocs on a tiny sample project.
+
+    This then grovels the generated HTML to see that the links were resolved.
     """
+    site_dir = Path(tmpdir).joinpath("site")
+    result = run_test_project_mkdocs(test_project, site_dir)
 
-    site_dir = Path(tmpdir).joinpath('site')
-    mkdocs_cmd = [
-        'mkdocs',
-        'build',
-        '-f',
-        str(test_project_mkdocs),
-        '-d',
-        str(site_dir)
-    ]
-    result = sp.run(mkdocs_cmd, stdout=sp.PIPE, stderr=sp.PIPE, encoding='utf8', check=False)
+    # Make sure the command succeeded
+    try:
+        result.check_returncode()
+    except sp.CalledProcessError:
+        print(result.stderr)  # noqa: T201
+        raise
 
-    assert result.returncode == 0
-
+    # There is a single intentional bad reference in the bar.py file
+    # make sure it was reported (check_crossrefs).
     m = re.search(
-        r"WARNING.*file://(/.*/myproj/bar.py):(\d+):\s*\n\s*Cannot load reference '(.*)'",
-        result.stderr
+        r"WARNING.*file://(.*[/\\]myproj[/\\]bar\.py):(\d+):\s*\n\s*Cannot load reference '(.*)'",
+        result.stderr,
     )
-    assert m is not None
-    if os.path.sep == '/':
-        assert m[1] == str(bar_src_file)
-    assert m[3] == 'myproj.bar.bad'
-    # Source location not accurate in python 3.7
-    bad_line = int(m[2])
-    bar_lines = bar_src_file.read_text().splitlines()
-    assert '[bad]' in bar_lines[bad_line - 1]
+    assert m is not None, result.stderr
+    assert m[1] == str(test_project.joinpath("src", "myproj", "bar.py"))
+    assert m[2] == "3"
+    assert m[3] == "myproj.bar.bad"
 
-    bar_html = site_dir.joinpath('bar', 'index.html').read_text()
-    bar_bs = bs4.BeautifulSoup(bar_html, 'html.parser')
+    # The original error for invalid references from autorefs should still be present too
+    m = re.search(
+        (
+            r"WARNING.*mkdocs_autorefs: bar\.md: from (.*[/\\]myproj[/\\]bar.py):(\d+): \(myproj\.bar\) "
+            r"Could not find cross-reference target '(.*)'"
+        ),
+        result.stderr,
+    )
+    assert m is not None, result.stderr
+    assert m[1] == str(test_project.joinpath("src", "myproj", "bar.py"))
+    assert m[2] == "1"  # line numbers aren't supported by mkdocs_autorefs, this is always 1
+    assert m[3] == "myproj.bar.bad"
 
-    autorefs: List[bs4.Tag] = bar_bs.find_all('a', attrs=['autorefs'])
-    assert len(autorefs) >= 5
-
+    # Verify the references (autorefs anchor tags) in the generated documentation HTML
     check_autorefs(
-        autorefs,
+        site_dir.joinpath("bar", "index.html"),
         {
-            ('myproj.bar.Bar', 'bar') : '#myproj.bar.Bar.bar',
-            ('myproj.bar.Bar.bar' , 'Bar') : '#myproj.bar.Bar',
-            ('myproj.bar.Bar.bar', 'foo') : '#myproj.bar.Bar.foo',
-            ('myproj.bar.Bar.bar', 'func') : '#myproj.bar.func',
-            ('myproj.bar.Bar.foo', 'Foo.foo') : '../foo/#myproj.foo.Foo.foo',
-            ('myproj.bar.func', 'bar') : '#myproj.bar'
-        }
+            ("myproj.bar.Bar", "Foo"): "../foo/#myproj.foo.Foo",  # from bases (parent class)
+            ("myproj.bar.Bar", "bar"): "#myproj.bar.Bar.bar",
+            ("myproj.bar.Bar.bar", "Bar"): "#myproj.bar.Bar",
+            ("myproj.bar.Bar.bar", "foo"): "#myproj.bar.Bar.foo",
+            ("myproj.bar.Bar.bar", "func"): "#myproj.bar.func",
+            ("myproj.bar.Bar.foo", "Foo.foo"): "../foo/#myproj.foo.Foo.foo",
+            ("myproj.bar.func", "bar"): "#myproj.bar",
+        },
     )
-
-    baz_html = site_dir.joinpath('pkg-baz', 'index.html').read_text()
-    baz_bs = bs4.BeautifulSoup(baz_html, 'html.parser')
-
-    autorefs = baz_bs.find_all('a', attrs=['autorefs'])
-    assert len(autorefs) >= 1
-
     check_autorefs(
-        autorefs,
+        site_dir.joinpath("pkg-baz", "index.html"),
         {
-            ('myproj.pkg.baz', 'func') : '../pkg/#myproj.pkg.func',
-        }
+            ("myproj.pkg.baz", "func"): "../pkg/#myproj.pkg.func",
+        },
     )
-
-

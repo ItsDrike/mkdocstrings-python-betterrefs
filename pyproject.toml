@@ -1,183 +1,191 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
-name = "mkdocstrings-python-xref"
-description = "Enhanced mkdocstrings python handler"
+name = "mkdocstrings-python-betterrefs"
+version = "0.1.0"
+license = "Apache-2.0"
+description = "Extended mkdocstrings-python handler with better cross-references support"
 readme = "README.md"
 authors = [
-    {name = "Christopher Barber", email="Christopher.Barber@analog.com" },
+  { name = "Christopher Barber", email = "Christopher.Barber@analog.com" },
+  { name = "ItsDrike", email = "itsdrike@protonmail.com" },
 ]
+maintainers = [{ name = "ItsDrike", email = "itsdrike@protonmail.com" }]
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Documentation",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Documentation",
+  "Topic :: Software Development",
+  "Topic :: Software Development :: Documentation",
+  "Topic :: Utilities",
+  "Typing :: Typed",
 ]
-keywords = [
-    "documentation-tool", "mkdocstrings", "mkdocstrings-handler", "python"
-]
-dynamic = ["version"]
-requires-python = ">=3.8"
+keywords = ["documentation", "mkdocstrings", "mkdocstrings-handler"]
+requires-python = ">=3.9"
 dependencies = [
-    "mkdocstrings-python >=1.6.2,<2.0",
-    "griffe >=1.0"
+  # TODO: Look into supported version ranges, for now
+  # require exact versions to ensure things will work.
+  "mkdocs>=1.4",
+  "mkdocs-autorefs>=1.3.0",
+  "mkdocstrings==0.28.0",
+  "mkdocstrings-python==1.14.6",
+  "griffe==1.5.6",
+  "typing-extensions>=4.0",
 ]
 
 [project.urls]
-Repository = "https://github.com/analog-garage/mkdocstrings-python-xref"
-Documentation = "https://analog-garage.github.io/mkdocstrings-python-xref/"
+Homepage = "https://itsdrike.github.com/mkdocstrings-python-betterrefs/"
+Documentation = "https://itsdrike.github.com/mkdocstrings-python-betterrefs/"
+Repository = "https://github.com/ItsDrike/mkdocstrings-python-betterrefs"
+Issues = "https://github.com/ItsDrike/mkdocstrings-python-betterrefs/issues"
 
-[tool.hatch.version]
-path = "src/mkdocstrings_handlers/python_xref/VERSION"
-pattern = "\\s*(?P<version>[\\w.]*)"
+[tool.uv]
+default-groups = ["lint", "test", "docs"]
 
-[tool.hatch.build]
-include = [
-    "src/**/*.py",
-    "src/mkdocstrings_handlers/python_xref/VERSION",
-    "src/mkdocstrings_handlers/python_xref/py.typed",
+[dependency-groups]
+lint = [
+  "pre-commit>=3.3.3",
+  "ruff>=0.9.2",
+  "basedpyright>=1.13.3",
+]
+test = [
+  "beautifulsoup4>=4.13.3",
+  "pytest>=8.3.4",
+]
+docs = [
+  # Most of the docs dependencies are already a part of the project itself
+  "mike>=2.1.2",
+  "mkdocs-material>=9.5.30",
 ]
 
-[tool.hatch.build.targets.sdist]
-packages = [
-    "src/mkdocstrings_handlers",
-    "src/mkdocstrings_handlers/python_xref",
+[tool.pytest.ini_options]
+filterwarnings = [
+  "error",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = [
-    "src/mkdocstrings_handlers",
-    "src/mkdocstrings_handlers/python_xref",
-]
+[tool.basedpyright]
+pythonPlatform = "All"
+pythonVersion = "3.9"
+typeCheckingMode = "all"
 
-[tool.mypy]
-check_untyped_defs = true
-mypy_path = "src"
-namespace_packages = true
-explicit_package_bases = true
-files = [
-    "src/mkdocstrings_handlers",
-    "tests"
-    ]
-show_error_codes = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+# Diagnostic behavior settings
+strictListInference = false
+strictDictionaryInference = false
+strictSetInference = false
+analyzeUnannotatedFunctions = true
+strictParameterNoneValue = true
+enableTypeIgnoreComments = true
+deprecateTypingAliases = true
+enableExperimentalFeatures = false
 
-[[tool.mypy.overrides]]
-module = [
-    "bs4"
-]
-ignore_missing_imports = true
+# Diagnostic rules
+reportAny = false
+reportExplicitAny = false
+reportImplicitStringConcatenation = false
+reportUnreachable = "hint"
+reportUnusedParameter = "hint"
+reportUnannotatedClassAttribute = false
+reportUnknownArgumentType = false           # consider enabling
+reportUnknownVariableType = false           # consider enabling
+reportUnknownMemberType = false             # consider enabling
+reportUnknownParameterType = false          # consider enabling
+reportUnknownLambdaType = false             # consider enabling
+reportMissingTypeStubs = "information"      # consider bumping to warning/error
+reportUninitializedInstanceVariable = false # until https://github.com/DetachHead/basedpyright/issues/491
+reportMissingParameterType = false          # ruff's flake8-annotations (ANN) already covers this + gives us more control
+
+[tool.ruff]
+target-version = "py39"
+line-length = 119
 
 [tool.ruff.lint]
-# TODO add "I" (isort)
-# TODO add "RUF"
-# TODO add "ARG"
-# TODO add "SIM"
-# TODO add "S" (bandit)
-# TODO add "PT" (pytest style)
-# TODO add "CPY101"
-select = ["E", "F", "PL", "D", "R", "T10", "EXE"]
+select = ["ALL"]
+
 ignore = [
-    "D105", # missing doc string for dunder methods
-    "D200", # one line doc string
-    "D202", # blank lines after function docstring
-    "D205", # doc on first line
-    "D212", # doc on first line
-    "D410", # blank line after doc section
-    "D411", # blank line before doc section
-    "D412", # no blank lines after section header
-    "D415", # doc title punctuation
-    "E501", # line too long
-    "PLC0105", # covariant metatype names
-    "PLR0913", # too-many-argument
-    "PLR2004", # magic value
-    "PT001", # allow @pytest.fixture without parens
-    "RET504", # unnecessary assignment to variable before return
-    "S101", # use of assert - do we care?
-    # TODO: fix the ones below
-    "D403", # capitalize first word of doc string
-    "D102", # undocumented public method
-    "D104", # missing docstring in public package
-    "D107", # __init__ docstring
-    "D417", # missing argument description
-]
-preview = true
-explicit-preview-rules = true # only preview explicitly selected rules (E.g. CPY001)
+  "C90", # mccabe
+  "FBT", # flake8-boolean-trap
+  "CPY", # flake8-copyright
+  "EM",  # flake8-errmsg
+  "SLF", # flake8-self
+  "ARG", # flake8-unused-arguments
+  "TD",  # flake8-todos
+  "FIX", # flake8-fixme
 
-[tool.ruff.lint.per-file-ignores]
-# Ignore some issues in tests
-"tests/**" = [
-    "F401", # unused import (pytest fixture)
-    "F403", # wildcard import (for fixtures)
-    "F405", # defined from star imports (typicallky a pytest fixture)
-    "F811", # redefinition of unused (typically a pytest fixture)
-    "PLR0912", # too many branches
-    "PLR0915", # too many statements
-    "S", # bandit rules
+  "D100", # Missing docstring in public module
+  "D104", # Missing docstring in public package
+  "D105", # Missing docstring in magic method
+  "D107", # Missing docstring in __init__
+  "D203", # Blank line required before class docstring
+  "D213", # Multi-line summary should start at second line (incompatible with D212)
+  "D301", # Use r""" if any backslashes in a docstring
+  "D405", # Section name should be properly capitalized
+  "D406", # Section name should end with a newline
+  "D407", # Missing dashed underline after section
+  "D408", # Section underline should be in the line following the section's name
+  "D409", # Section underline should match the length of its name
+  "D410", # Missing blank line after section
+  "D411", # Missing blank line before section
+  "D412", # No blank lines allowed between a section header and its content
+  "D413", # Missing blank line after last section
+  "D414", # Section has no content
+  "D416", # Section name should end with a colon
+  "D417", # Missing argument descrition in the docstring
+
+  "ANN002", # Missing type annotation for *args
+  "ANN003", # Missing type annotation for **kwargs
+  "ANN204", # Missing return type annotation for special method
+  "ANN401", # Dynamically typed expressions (typing.Any) disallowed
+
+  "SIM102", # use a single if statement instead of nested if statements
+  "SIM108", # Use ternary operator {contents} instead of if-else-block
+
+  "TC001", # Move application imports used only for annotations into a type-checking block
+  "TC002", # Move 3rd-party imports used only for annotations into a type-checking block
+  "TC003", # Move standard library imports used only for annotations into a type-checking block
+
+  "TD002", # Missing author in TODO
+  "TD003", # Missing issue link on the line following this TODO
+
+  "TRY003",  # No f-strings in raise statements
+  "EM101",   # No string literals in exception init
+  "EM102",   # No f-strings in exception init
+  "PLR2004", # Using unnamed numerical constants
+  "PGH003",  # Using specific rule codes in type ignores
+  "E731",    # Don't assign a lambda expression, use a def
 ]
 
-[tool.ruff.lint.pylint]
-#max-locals = 30
-max-branches = 15
-#max-attributes = 30
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/*" = [
+  "ANN",  # flake8-annotations
+  "S101", # Use of assert
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[too.ruff.format]
-skip-magic-trailing-comma = false
+[tool.ruff.lint.pylint]
+max-args = 20
+max-branches = 20
+max-returns = 20
+max-statements = 250
+
+[tool.ruff.format]
 line-ending = "lf"
 
-[tool.pylint.main]
-jobs = 0
-# Minimum Python version to use for version dependent checks.
-py-version = "3.8"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.pylint.format]
-max-line-length = 110
-max-module-lines = 2000
-
-[tool.pylint."messages control"]
-disable = [
-    "bad-inline-option",
-    "c-extension-no-member",
-    "consider-using-from-import",
-    "deprecated-pragma",
-    "disallowed-name",
-    "file-ignored",
-    "fixme",
-    "import-outside-toplevel",
-    "invalid-characters-in-docstring",
-    "invalid-name",
-    "locally-disabled",
-    "multiple-statements",
-    "no-else-return",
-    "raw-checker-failed",
-    "superfluous-parens",
-    "suppressed-message",
-    "too-few-public-methods",
-    "too-many-arguments",
-    "too-many-branches",
-    "too-many-instance-attributes",
-    "too-many-locals",
-    "too-many-public-methods",
-    "too-many-statements",
-    "trailing-newlines",
-    "trailing-whitespace",
-    "unspecified-encoding",
-    "unused-wildcard-import",
-    "use-dict-literal",
-    "use-symbolic-message-instead",
-    "useless-suppression",
-    "wrong-import-order",
-    "wrong-import-position",
-    "wrong-spelling-in-comment",
-    "wrong-spelling-in-docstring",
-]
+[tool.hatch.build.targets.wheel]
+only-include = ["src/mkdocstrings_handlers"]
+sources = ["src"]
