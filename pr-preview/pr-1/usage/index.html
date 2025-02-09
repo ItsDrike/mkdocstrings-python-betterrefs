@@ -955,8 +955,9 @@
 
 <h1 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h1>
 <h2 id="relative-cross-references">Relative cross-references<a class="headerlink" href="#relative-cross-references" title="Permanent link">&para;</a></h2>
-<p>Like already mentioned before, <code>mkdocstrings-python-betterrefs</code> allows you to use a custom syntax when specifying your
-cross-references. The most important feature is the relative cross-references support. Check the example below:</p>
+<p>As already mentioned before, <code>mkdocstrings-python-betterrefs</code> allows you to use a custom improved syntax when specifying
+your cross-references, to make your references shorter and easier to comprehend. The most important feature is the
+relative cross-references support. Check the example below:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Absolute</label><label for="__tabbed_1_2">Relative</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -985,24 +986,32 @@ cross-references. The most important feature is the relative cross-references su
 </div>
 </div>
 </div>
-<p>The relative path specifier has the following form:</p>
+<p>The relative path specifier works as follows:</p>
 <ul>
-<li>If the path begins with <code>(c)</code>, that will be replaced by the path of the class that contains the doc-string.</li>
-<li>If the path begins with <code>(m)</code>, that will be replaced by the path of the module that contains the doc-string.</li>
-<li>If the path begins with <code>(p)</code>, that will be replaced by the path of the package that contains the doc-string. If
-  there is only one module in the system it will be treated as a package.</li>
+<li><code>(c)</code>: Replaced by the path of the <strong>class</strong> that contains the docstring.</li>
+<li><code>(m)</code>: Replaced by the path of the <strong>module</strong> that contains the docstring.</li>
+<li><code>(p)</code>: Replaced by the path of the <strong>package</strong> that contains the docstring. (If this is a stand-alone module, this
+  module will be treated as a package.)</li>
 <li>
-<p>If the path begins with one or more <code>.</code> characters, then it well be expanded to the path of the current
-  doc-string, in which it occurs, or it's parent elements.</p>
-<p>For example, when used in a doc-string for a method, <code>.</code> would get replaced by the method, <code>..</code> would get replaced by
-the class and <code>...</code> would get replaced with the module.</p>
+<p><strong>One or more <code>.</code> characters:</strong> Expanded to the path of the current docstring (or its parent elements).</p>
+<p>For example, in a method's docstring:</p>
 </li>
 <li>
-<p>Similarly, if the path begins with one or more <code>^</code> characters, then it will be replaced by the path of the parent
-  element. Essentially, this is just a shorthand for <code>..</code>, which occurs a lot.</p>
-<p>For example, when used in a doc-string for a method, <code>^</code> would get replaced with the class and <code>^^</code> would get
-replaced with the module.</p>
+<p><code>.</code> is replaced by the method name,</p>
 </li>
+<li><code>..</code> is replaced by the class name, and</li>
+<li>
+<p><code>...</code> is replaced by the module name.</p>
+</li>
+<li>
+<p><strong>One or more <code>^</code> characters:</strong> Replaced by the path of the parent element. This is a shorthand for .., which is
+  commonly used.</p>
+<p>For instance, in a method's docstring:</p>
+</li>
+<li>
+<p><code>^</code> is replaced by the class name, and</p>
+</li>
+<li><code>^^</code> is replaced by the module name.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1010,10 +1019,11 @@ replaced with the module.</p>
 difficult to read and should be avoided</p>
 </div>
 <h2 id="avoiding-repetition">Avoiding repetition<a class="headerlink" href="#avoiding-repetition" title="Permanent link">&para;</a></h2>
-<p>On top of just the relative reference support, there's also some special handling to reduce the repetition of
-references like: <code>[MyClass][..MyClass]</code>, allowing for a much more compact: <code>[MyClass][..]</code> syntax.</p>
-<p>This rule is applied whenever the cross-reference path ends in <code>.</code>; When this happens, the title text will be appended
-to the path (ignoring bold, italic or code markup).</p>
+<p>In addition to relative reference support, there's special handling to reduce repetitive reference declarations in the
+title and the cross-reference target. For instance, instead of writing <code>[MyClass][..MyClass]</code>, you can simply write
+<code>[MyClass][..]</code>, resulting in a much cleaner and more compact syntax.</p>
+<p>This rule applies when the cross-reference path ends with a period (<code>.</code>); in such cases, the title text is automatically
+appended to the path (ignoring any bold, italic, or code markup).</p>
 <h2 id="demonstration">Demonstration<a class="headerlink" href="#demonstration" title="Permanent link">&para;</a></h2>
 <p>Quick demonstration:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">mkdocstrings-python-betterrefs</label><label for="__tabbed_2_2">mkdocstrings-python</label></div>
@@ -1065,21 +1075,23 @@ to the path (ignoring bold, italic or code markup).</p>
 </div>
 </div>
 <h2 id="cross-reference-checking">Cross-reference checking<a class="headerlink" href="#cross-reference-checking" title="Permanent link">&para;</a></h2>
-<p>If <code>check_crossrefs</code> is enabled (default), then all cross-reference expressions will be checked to ensure that they
+<p>If <code>check_crossrefs</code> is enabled (default), then all cross-reference expressions will be validated to ensure that they
 exist. Failures will be reported with the source location information.</p>
-<p>Otherwise, missing cross-references will still be reported by <code>mkdocstrings</code> directly, however, these reports do not
-include the source location, which often makes it difficult to find the docstring causing this issue in the source
-code.</p>
-<p>Note that the errors generated by this feature are in addition to the errors from mkdocstrings, which will mean you
+<p>If disabled, missing cross-references will still be reported by <code>mkdocstrings</code> directly, but these reports lack source
+location details, which can make it challenging to locate the problematic docstring.</p>
+<p>Note that the errors generated by this feature are in addition to the errors from <code>mkdocstrings</code>, which will mean you
 will see 2 errors for each invalid reference.</p>
-<p>The current implementation of this feature can produce false errors for definitions from the python standard library,
-or external imported libraries. You can disable the check on a case-by-case basis by prefixing the reference
-expression with a <code>?</code>, for example:</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The current implementation of this feature can produce false errors for definitions from the python standard
+library, or external imported libraries. You can disable the check on a case-by-case basis by prefixing the
+reference expression with a <code>?</code>, for example:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="sd">    This function returns a [Path][?pathlib.] instance.</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div>
+</div>
 
 
 
