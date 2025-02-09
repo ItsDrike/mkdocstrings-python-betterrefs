@@ -987,18 +987,22 @@ relative cross-references support. Check the example below:</p>
 </div>
 </div>
 <p>The relative path specifier works as follows:</p>
+<!-- prettier-ignore-start -->
+
 <ul>
 <li><code>(c)</code>: Replaced by the path of the <strong>class</strong> that contains the docstring.</li>
 <li><code>(m)</code>: Replaced by the path of the <strong>module</strong> that contains the docstring.</li>
-<li><code>(p)</code>: Replaced by the path of the <strong>package</strong> that contains the docstring. (If this is a stand-alone module, this
-  module will be treated as a package.)</li>
+<li>
+<p><code>(p)</code>: Replaced by the path of the <strong>package</strong> that contains the docstring. (If this is a stand-alone module, this
+  module will be treated as a package.)</p>
+</li>
 <li>
 <p><strong>One or more <code>.</code> characters:</strong> Expanded to the path of the current docstring (or its parent elements).</p>
+</li>
+</ul>
 <p>For example, in a method's docstring:</p>
-</li>
-<li>
-<p><code>.</code> is replaced by the method name,</p>
-</li>
+<ul>
+<li><code>.</code> is replaced by the method name,</li>
 <li><code>..</code> is replaced by the class name, and</li>
 <li>
 <p><code>...</code> is replaced by the module name.</p>
@@ -1006,13 +1010,15 @@ relative cross-references support. Check the example below:</p>
 <li>
 <p><strong>One or more <code>^</code> characters:</strong> Replaced by the path of the parent element. This is a shorthand for .., which is
   commonly used.</p>
+</li>
+</ul>
 <p>For instance, in a method's docstring:</p>
-</li>
-<li>
-<p><code>^</code> is replaced by the class name, and</p>
-</li>
+<ul>
+<li><code>^</code> is replaced by the class name, and</li>
 <li><code>^^</code> is replaced by the module name.</li>
 </ul>
+<!-- prettier-ignore-end -->
+
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>When using either <code>^</code> or <code>..</code> we have found that going up more than one or two levels makes cross-references
