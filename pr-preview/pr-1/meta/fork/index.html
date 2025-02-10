@@ -917,12 +917,14 @@
 
 
 <h1 id="fork-notice">Fork notice<a class="headerlink" href="#fork-notice" title="Permanent link">&para;</a></h1>
-<p>This project is a fork of the excellent <a href="https://github.com/analog-garage/mkdocstrings-python-xref">mkdocstrings-python-xref</a> project. The primary reason for forking is that the
-original project seems to no longer be maintained, or at least not actively maintained.</p>
+<p>This project is a fork of the excellent <a href="https://github.com/analog-garage/mkdocstrings-python-xref">mkdocstrings-python-xref</a> project. The primary reason for forking was personal
+curiosity with how this project worked, though another reason was also that the original project was somewhat slow at
+addressing some issues and used fairly uncommon packaging practices when it comes to modern python, which IMO made it
+harder to contribute to.</p>
 <p>At its core, this fork retains the original functionality while addressing compatibility issues that arose as its
 dependencies (namely: mkdocstrings, mkdocstrings-python, mkdocstrings-autorefs, and griffe) were updated.</p>
 <p>In addition, significant improvements have been made to the codebase, including cleanup and updates to follow modern
-packaging practices. For example, we've moved away from Conda in favor of <a href="https://docs.astral.sh/uv">uv</a>.</p>
+packaging practices. For example, this project moved away from Conda in favor of <a href="https://docs.astral.sh/uv">uv</a>.</p>
 <p>We’ve also placed a greater emphasis on properly managing project dependencies. Stricter version requirements have been
 applied to ensure stability, meaning that new versions of dependencies will only be supported once they’ve been properly
 tested. The goal is to automate this process with GitHub workflows that will periodically check for new versions, run
@@ -931,8 +933,8 @@ internal features of <a href="https://github.com/mkdocstrings/python">mkdocstrin
 <p>It's important to note that this is a "hard fork," meaning future updates to the original mkdocstrings-python-xref will
 not necessarily be merged back here. This is mainly because the code-base of this project has become sufficiently
 different to make that task pretty hard. However, if a relevant feature from the original project is introduced, we may
-consider porting it to this fork. That said, considering this project seems to be unmaintained, this likely won't be a
-concern.</p>
+consider porting it to this fork. That said, considering this project haven't released a new feature in quite a while
+now, this likely won't be a concern.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Due to technical reasons, this project is not marked as a "fork" on GitHub, even though it is one. Forked repositories
