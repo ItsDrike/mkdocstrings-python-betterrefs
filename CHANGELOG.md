@@ -1,4 +1,8 @@
-## [UNRELEASED] Version 0.1.0 (2025-02-09)
+## Version 1.0.1 (2025-02-12)
+
+Documentation improvements.
+
+## Version 1.0.0 (2025-02-12)
 
 This is the initial release following a **rewrite of the project (fork)**.
 

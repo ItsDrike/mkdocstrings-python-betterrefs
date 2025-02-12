@@ -492,7 +492,7 @@ wheels = [
 
 [[package]]
 name = "mkdocstrings-python-betterrefs"
-version = "1.0.0"
+version = "1.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "griffe" },
