@@ -2,12 +2,8 @@
 
 ![Supported python versions](https://img.shields.io/pypi/pyversions/mkdocstrings-python-betterrefs.svg)
 [![Current PyPI version](https://img.shields.io/pypi/v/mkdocstrings-python-betterrefs.svg)](https://pypi.org/project/mkdocstrings-python-betterrefs/)
-
-[![Validation](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/validation.yml/badge.svg)](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/validation.yml)
-[![Unit tests](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/unit-tests.yml)
-
 ![License](https://img.shields.io/github/license/ItsDrike/mkdocstrings-python-betterrefs)
-
+[![CI](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/main.yml/badge.svg)](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/main.yml)
 [![Docs](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/mkdocs.yml/badge.svg)](https://itsdrike.github.io/mkdocstrings-python-betterrefs)
 
 Python handler for [mkdocstrings] with improved handling for cross-references, including relative ones.
