@@ -1,0 +1,83 @@
+name: Publish to PyPI / GitHub
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.14"
+
+jobs:
+  build:
+    name: "Build the project"
+    runs-on: ubuntu-latest
+
+    outputs:
+      prerelease: ${{ steps.check-version.outputs.prerelease }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+          cache-suffix: "publish-py${{ env.python-version }}"
+
+      - name: Install dependencies
+        run: |
+          # We only need the project dependencies, no development deps
+          uv sync --no-default-groups
+
+      - name: Upload build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: "dist"
+          path: "dist/"
+          if-no-files-found: error
+          retention-days: 5
+
+  publish-github:
+    name: "Publish a GitHub release"
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download the distribution files from PR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: "dist"
+          path: "dist/"
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*"
+          bodyFile: changelog.txt
+          draft: false
+
+  publish-pypi:
+    name: "Publish to PyPI"
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      # Used to authenticate to PyPI via OIDC.
+      id-token: write
+
+    steps:
+      - name: Download the distribution files from PR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: "dist"
+          path: "dist/"
+
+      # This uses PyPI's trusted publishing, so no token is required
+      - name: Release to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
