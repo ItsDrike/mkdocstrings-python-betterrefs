@@ -36,6 +36,9 @@ jobs:
           # We only need the project dependencies, no development deps
           uv sync --no-default-groups
 
+      - name: Build the project
+        run: uv build
+
       - name: Upload build files
         uses: actions/upload-artifact@v4
         with:
