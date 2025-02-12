@@ -79,4 +79,15 @@ jobs:
 
       - name: Deploy docs - latest
         if: ${{ github.event_name == 'push' }}
-        run: git push origin gh-pages
+        run: |
+          # Make sure we fetch first, as another mkdocs ci may have finished
+          # ahead of this one (can happen during releases, when mkdocs workflow
+          # runs for both version tags and latest main releases concurrently)
+          # Conflicts shouldn't occur here, these just create new dirs, version
+          # tags will modify versions.json, but this shouln't conflict as latest
+          # push builds don't modify it and we shouldn't ever see two version
+          # tags running concurrently (even if, git might be smart enough to
+          # handle that without a conflict, but I haven't tested it).
+          git fetch origin gh-pages
+          git checkout gh-pages
+          git pull --rebase || { echo "Conflict detected, stopping."; exit 1; }
