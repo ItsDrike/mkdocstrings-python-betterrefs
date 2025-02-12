@@ -33,13 +33,8 @@ classifiers = [
 keywords = ["documentation", "mkdocstrings", "mkdocstrings-handler"]
 requires-python = ">=3.9"
 dependencies = [
-  # TODO: Look into supported version ranges, for now
-  # require exact versions to ensure things will work.
-  "mkdocs>=1.4",
-  "mkdocs-autorefs>=1.3.0",
-  "mkdocstrings==0.28.0",
-  "mkdocstrings-python==1.14.6",
-  "griffe==1.5.6",
+  "mkdocstrings-python>=1.14.1,<1.15.0",
+  "griffe>=1.0.0",
   "typing-extensions>=4.0",
 ]
 
