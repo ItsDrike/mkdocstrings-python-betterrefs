@@ -2,7 +2,7 @@
 
 ![Supported python versions](https://img.shields.io/pypi/pyversions/mkdocstrings-python-betterrefs.svg)
 [![Current PyPI version](https://img.shields.io/pypi/v/mkdocstrings-python-betterrefs.svg)](https://pypi.org/project/mkdocstrings-python-betterrefs/)
-![License](https://img.shields.io/github/license/ItsDrike/mkdocstrings-python-betterrefs)
+[![License](https://img.shields.io/github/license/ItsDrike/mkdocstrings-python-betterrefs)](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/blob/main/LICENSE.txt)
 [![CI](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/main.yml/badge.svg)](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/main.yml)
 [![Docs](https://github.com/ItsDrike/mkdocstrings-python-betterrefs/actions/workflows/mkdocs.yml/badge.svg)](https://itsdrike.github.io/mkdocstrings-python-betterrefs)
 
