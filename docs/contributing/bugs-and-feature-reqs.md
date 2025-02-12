@@ -176,7 +176,7 @@ being used.
 
 Before starting your work though, make sure to also read our [pull request guide][pr-guide].
 
-[versioning]: ./versioning.md
+[versioning]: ../meta/versioning.md
 [issue-tracker]: https://github.com/ItsDrike/mkdocstrings-python-betterrefs/issues
 [open-bug-issue]: https://github.com/ItsDrike/mkdocstrings-python-betterrefs/issues/new?labels=bug&template=bug-report.yml
 [open-feature-req-issue]: https://github.com/ItsDrike/mkdocstrings-python-betterrefs/issues/new?labels=feature&template=feature-request.yml
