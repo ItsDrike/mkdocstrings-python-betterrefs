@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
   pull_request:
     types: # Add closed type
       - opened
@@ -67,9 +69,13 @@ jobs:
           umbrella-dir: pr-preview
           token: ${{ github.token }}
 
-      - name: Build the documentation (mike)
-        if: ${{ github.event_name == 'push' }}
+      - name: Build the documentation (mike / latest)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: mike deploy latest
+
+      - name: Build the documentation (mike / release tag)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        run: mike deploy  --update-aliases "$(git describe)" release
 
       - name: Deploy docs - latest
         if: ${{ github.event_name == 'push' }}
