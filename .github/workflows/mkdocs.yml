@@ -32,7 +32,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: "${{ github.token }}"
           # Fetch the entire git history (all branches + tags)
           # We do this because the docs use git describe, which requires having all
           # the commits up to the latest version tag.
@@ -90,4 +89,6 @@ jobs:
           # handle that without a conflict, but I haven't tested it).
           git fetch origin gh-pages
           git checkout gh-pages
+          git branch --set-upstream-to=origin/gh-pages gh-pages
           git pull --rebase || { echo "Conflict detected, stopping."; exit 1; }
+          git push

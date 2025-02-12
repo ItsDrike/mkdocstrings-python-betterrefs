@@ -1,6 +1,7 @@
 name: Publish to PyPI / GitHub
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*"
@@ -51,6 +52,8 @@ jobs:
     name: "Publish a GitHub release"
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
 
     steps:
       - name: Download the distribution files from PR artifact
