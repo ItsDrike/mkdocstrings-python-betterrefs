@@ -17,6 +17,11 @@
   {
     "version": "v1.0.1-7-g9973605",
     "title": "v1.0.1-7-g9973605",
+    "aliases": []
+  },
+  {
+    "version": "v1.0.1-7-g8466249",
+    "title": "v1.0.1-7-g8466249",
     "aliases": [
       "release"
     ]
