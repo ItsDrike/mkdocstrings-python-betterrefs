@@ -58,7 +58,7 @@ class PythonBetterRefsHandler(PythonHandler):
         options: PythonBetterRefsOptions,
     ) -> str:
         if options.better_crossrefs:
-            checkref = self._check_ref if options.check_crossrefs else None
+            checkref = (lambda ref: self._check_ref(ref, options)) if options.check_crossrefs else None
             substitute_relative_crossrefs(data, checkref=checkref)
 
         try:
@@ -74,11 +74,11 @@ class PythonBetterRefsHandler(PythonHandler):
             handler = "python"
         return super().get_templates_dir(handler)
 
-    def _check_ref(self, ref: str) -> bool:
+    def _check_ref(self, ref: str, options: PythonOptions) -> bool:
         """Check for existence of reference."""
         # Try to collect the reference normally and see if it fails
         try:
-            self.collect(ref, PythonOptions())
+            self.collect(ref, options)
         except CollectionError:
             return False
         else:

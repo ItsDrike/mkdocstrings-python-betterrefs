@@ -315,7 +315,7 @@ def test_render(
     monkeypatch.setattr(PythonHandler, "render", fake_render)
 
     # Patch check-ref according to the test parameters
-    monkeypatch.setattr(PythonBetterRefsHandler, "_check_ref", lambda self, ref: checkref_result)
+    monkeypatch.setattr(PythonBetterRefsHandler, "_check_ref", lambda self, ref, opts: checkref_result)
 
     # Test if rendering works as expected
     rendered = handler.render(griffe_obj, PythonBetterRefsOptions.from_data(**options))
