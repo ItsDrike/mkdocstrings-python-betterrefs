@@ -1,3 +1,7 @@
+## Version 1.0.2
+
+(bugfix) Pass configuration options over to collect during reference checking.
+
 ## Version 1.0.1 (2025-02-12)
 
 Documentation improvements.
