@@ -65,7 +65,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      contents: write
 
     steps:
       - name: Download the distribution files from PR artifact
