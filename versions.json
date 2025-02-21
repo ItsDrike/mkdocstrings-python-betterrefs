@@ -7,6 +7,11 @@
   {
     "version": "v1.0.1-7-gf1c7c8f",
     "title": "v1.0.1-7-gf1c7c8f",
+    "aliases": []
+  },
+  {
+    "version": "v1.0.1-7-g4ee6eb8",
+    "title": "v1.0.1-7-g4ee6eb8",
     "aliases": [
       "release"
     ]
