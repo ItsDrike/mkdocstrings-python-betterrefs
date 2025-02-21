@@ -22,14 +22,19 @@
   {
     "version": "v1.0.1-7-g8466249",
     "title": "v1.0.1-7-g8466249",
-    "aliases": [
-      "release"
-    ]
+    "aliases": []
   },
   {
     "version": "v1.0.1-7-g191966a",
     "title": "v1.0.1-7-g191966a",
     "aliases": []
+  },
+  {
+    "version": "v1.0.1-7-g8bdc496",
+    "title": "v1.0.1-7-g8bdc496",
+    "aliases": [
+      "release"
+    ]
   },
   {
     "version": "v1.0.1-7-g4ee6eb8",
