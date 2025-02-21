@@ -5,6 +5,13 @@
     "aliases": []
   },
   {
+    "version": "v1.0.1-7-gf04575c",
+    "title": "v1.0.1-7-gf04575c",
+    "aliases": [
+      "release"
+    ]
+  },
+  {
     "version": "v1.0.1-7-gf1c7c8f",
     "title": "v1.0.1-7-gf1c7c8f",
     "aliases": []
@@ -32,9 +39,7 @@
   {
     "version": "v1.0.1-7-g8bdc496",
     "title": "v1.0.1-7-g8bdc496",
-    "aliases": [
-      "release"
-    ]
+    "aliases": []
   },
   {
     "version": "v1.0.1-7-g4ee6eb8",
